@@ -7,8 +7,8 @@ struct Response {
 }
 
 #[derive(Serialize)]
-struct Name {
-    name: String,
+struct Greeting {
+    greeting: String,
 }
 
 #[get("/")]
@@ -20,9 +20,9 @@ async fn hello() -> Result<impl Responder> {
 }
 
 #[get("/{name}")]
-async fn get_name(name: web::Path<String>) -> Result<impl Responder> {
-    let name_response = Name {
-        name: name.to_string(),
+async fn greet(name: web::Path<String>) -> Result<impl Responder> {
+    let name_response = Greeting {
+        greeting: format!("Hello {}", name.to_string()),
     };
 
     Ok(web::Json(name_response))
@@ -35,7 +35,7 @@ async fn main() -> std::io::Result<()> {
             web::scope("/api/v1")
                 .guard(guard::Header("content-type", "application/json"))
                 .service(hello)
-                .service(get_name),
+                .service(greet),
         )
     })
     .bind(("127.0.0.1", 5000))?
